@@ -20,6 +20,10 @@ class Person
     self.last_name = parts.size > 1 ? parts.last : ''
   end
 
+  def to_s
+    name
+  end
+
 end
 
 bob = Person.new('Robert Smith')
@@ -27,3 +31,4 @@ rob = Person.new('Robert Smith')
 
 bob.name == rob.name
   
+puts "This person's name is #{bob}"
