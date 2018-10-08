@@ -1,3 +1,4 @@
+
 class Player
   attr_accessor :move, :name
 
@@ -43,6 +44,7 @@ class Player
 
 end
 
+# Game Orchestration Engine
 class RPSGame
   attr_accessor :human, :computer
 
