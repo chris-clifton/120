@@ -1,3 +1,5 @@
+#Up to Design Choice 1
+
 
 class Player
   attr_accessor :move, :name
