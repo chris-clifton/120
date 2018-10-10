@@ -1,5 +1,9 @@
 require 'pry'
 
+# The classes for each Move were created but they can't "beat" each other.  Must be done before moving on.
+# History array is holding Move obejects but the output looks like shit
+# Need to create computer AI based on history once fixed
+
 winning_match_score = 3
 
 def prompt(msg)
@@ -23,26 +27,6 @@ class Move
   def to_s
     @value.capitalize
   end
-
-  # def rock?
-  #   @value == 'rock'
-  # end
-
-  # def paper?
-  #   @value == 'paper'
-  # end
-
-  # def scissors?
-  #   @value == 'scissors'
-  # end
-
-  # def lizard?
-  #   @value == 'lizard'
-  # end
-
-  # def spock?
-  #   @value == 'spock'
-  # end
 
   def greater_than?(other_move)
     (rock? && other_move.scissors?) ||

@@ -1,6 +1,6 @@
 require 'pry'
-MATCH_TYPES = [1, 3, 5, 10]
-winning_match_score = 0
+
+winning_match_score = 3
 
 def prompt(msg)
   puts("=> #{msg}")
@@ -10,25 +10,11 @@ def clear_screen
   system('clear') || system('cls')
 end
 
-# This method needs improvement.  First, 3 wins != best of 3, etc. Additionally, it does not work at all.
-def choose_match_type(winning_match_score)
-  answer = 0
-  loop do
-    prompt("Please select match type:")
-    puts "(1) Sudden Death!"
-    puts "(3) Best of three"
-    puts "(5) Best of five"
-    puts "(10) First to ten"
-    answer = gets.chomp.to_i
-    break if MATCH_TYPES.include? answer
-  end
-  winning_match_score = answer
-end
-
-
-
 class Move
   VALUES = ['rock', 'paper', 'scissors', 'lizard', 'spock']
+
+  # Is this getter/setter doing anything? Remove if not.
+  attr_accessor :value
 
   def initialize(value)
     @value = value
@@ -38,25 +24,25 @@ class Move
     @value.capitalize
   end
 
-  def rock?
-    @value == 'rock'
-  end
+  # def rock?
+  #   @value == 'rock'
+  # end
 
-  def paper?
-    @value == 'paper'
-  end
+  # def paper?
+  #   @value == 'paper'
+  # end
 
-  def scissors?
-    @value == 'scissors'
-  end
+  # def scissors?
+  #   @value == 'scissors'
+  # end
 
-  def lizard?
-    @value == 'lizard'
-  end
+  # def lizard?
+  #   @value == 'lizard'
+  # end
 
-  def spock?
-    @value == 'spock'
-  end
+  # def spock?
+  #   @value == 'spock'
+  # end
 
   def greater_than?(other_move)
     (rock? && other_move.scissors?) ||
@@ -85,17 +71,60 @@ class Move
   end
 end
 
-class Player
-  attr_accessor :move, :name, :score
+class Rock < Move
+  attr_accessor :name
+  
+  def initialize
+    @name = 'Rock'
+  end
+end
+
+class Paper < Move
+  attr_accessor :name
 
   def initialize
-    # set_name
+    @name = 'Paper'
+  end
+end
+
+class Scissors < Move
+  attr_accessor :name
+
+  def initialize
+    @name = 'Scissors'
+  end
+end
+
+class Lizard < Move
+  attr_accessor :name
+
+  def initialize
+    @name = 'Lizard'
+  end
+end
+
+class Spock < Move
+  attr_accessor :name
+  
+  def initialize
+    @name = 'Spock'
+  end
+end
+
+class Player
+  attr_accessor :move, :name, :score, :history
+
+  def initialize
     @score = 0
     @history = []
   end
 end
 
 class Human < Player
+  def initialize
+    super
+  end
+
   def set_name
     n = ''
     loop do
@@ -116,7 +145,6 @@ class Human < Player
       prompt("Sorry, invalid choice.")
     end
     self.move = Move.new(choice)
-    @history << choice
   end
 end
 
@@ -127,7 +155,6 @@ class Computer < Player
 
   def choose
     self.move = Move.new(Move::VALUES.sample)
-    @history << self.move
   end
 end
 
@@ -146,91 +173,98 @@ class RPSGame
     gets.chomp
   end
 
-  def display_match_length
-    case winning_match_score
-    when 2
-      puts "Best of three!"
-    when 3
-      puts "Best of five!"
-    when 10
-      puts "First to ten!"
-    end
-  end
-
   def display_goodbye_message
     prompt("Thanks for playing Rock, Paper, Scissors, Lizard, Spock!")
   end
 
-  def display_info
+  def display_scoreboard
     clear_screen
-    display_match_length
-    puts "#{human.name} score: #{human.score}"
-    puts "#{computer.name} score: #{computer.score}"
+    prompt("#{human.name} score: #{human.score}")
+    prompt("#{computer.name} score: #{computer.score}")
     puts ""
   end
 
   def display_round_winner
-    prompt("#{human.name} chose #{human.move}.")
-    prompt("#{computer.name} chose #{computer.move}.")
-    prompt(" #{calculate_round_winner}")
-    end
-
-  def calculate_round_winner
-    if human.move.greater_than?(computer.move)
-      human.score += 1
-      "#{human.name} won!"
-    elsif human.move.less_than?(computer.move)
-      computer.score += 1
-      "#{computer.name} won!"
+    puts ""
+    if round_winner
+      prompt("#{round_winner.name} won!")
     else
-      "It's a tie- no points!"
+      prompt("It's a tie- no points awarded!")
+    end
+    puts ""
+  end
+
+  def round_winner 
+    if human.move.greater_than?(computer.move)
+      human
+    elsif computer.move.greater_than?(human.move)
+      computer
     end
   end
 
-  def match_winner?
-    (human.score >= winning_match_score) ||
-      (computer.score >= winning_match_score)
+  def calculate_score
+    round_winner.score += 1
+  end  
+
+  def add_move_to_history
+    human.history << human.move
+    computer.history << computer.move
+  end
+
+  def display_move_history
+    prompt("#{human.name} previous moves: #{human.history}")
+    prompt("#{computer.name} previous moves: #{computer.history}")
+  end
+
+  def match_winner?(match_score)
+    (human.score >= match_score) ||
+      (computer.score >= match_score)
   end
 
   def display_match_winner
     prompt("#{@human.name} won #{@human.score} rounds.")
     prompt("#{@computer.name} won #{@computer.score} rounds.")
     puts ""
-    if @human.score > @computer.score
-      prompt("#{@human.name} won the match!")
-    else prompt("#{@computer.name} won the match!")
-    end
+    prompt("#{round_winner.name} won the match!")
   end
 
-  def play_again?
+  def display_moves
+    prompt("#{human.name} chose #{human.move}...")
+    prompt("#{computer.name} chose #{computer.move}...")
+  end
+
+  def play_next_round?
     answer = nil
     loop do
       prompt("Play next round? (y/n)")
-      answer = gets.chomp
-      break if ['y', 'n'].include? answer.downcase
+      answer = gets.chomp.downcase
+      break if ['y', 'n'].include? answer
       prompt("Sorry, must be y or n.")
     end
     return true if answer == 'y'
     false
   end
 
-  def play
+  def play(winning_match_score)
     display_welcome_message
     human.set_name
     computer.set_name
-    # choose_match_type(winning_match_score)
     loop do
-      display_info
+      display_scoreboard
       human.choose
       computer.choose
+      display_moves
       display_round_winner
-      # binding.pry
-      break if match_winner?
-      break unless play_again?
+      calculate_score if round_winner
+      add_move_to_history
+      # display_move_history
+      break if match_winner?(winning_match_score)
+      break unless play_next_round?
     end
+    #display_scoreboard
     display_match_winner
     display_goodbye_message
   end
 end
 
-RPSGame.new.play
+RPSGame.new.play(winning_match_score)
