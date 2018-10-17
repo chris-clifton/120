@@ -9,6 +9,7 @@ class Board
     # Create an empty hash, then using a range, populates hash with integers as keys and INITIAL_MARKER as values
     @squares = {}
     (1..9).each {|key| @squares[key] = Square.new }
+    reset
   end
 
   def get_square_at(key)
@@ -32,20 +33,28 @@ class Board
     !!detect_winner
   end
 
+  def count_human_marker(squares)
+    squares.collect(&:marker).count(TTTGame::HUMAN_MARKER)
+  end
+
+  def count_computer_marker(squares)
+    squares.collect(&:marker).count(TTTGame::COMPUTER_MARKER)
+  end
+
   def detect_winner
     # Returns winning marker or nil
     WINNING_LINES.each do |line|
-      if @squares[line[0]].marker == TTTGame::HUMAN_MARKER && 
-          @squares[line[1]].marker == TTTGame::HUMAN_MARKER && 
-          @squares[line[2]].marker == TTTGame::HUMAN_MARKER
+      if count_human_marker(@squares.values_at(*line)) == 3
         return TTTGame::HUMAN_MARKER
-      elsif @squares[line[0]].marker == TTTGame::COMPUTER_MARKER &&
-              @squares[line[1]].marker == TTTGame::COMPUTER_MARKER &&
-              @squares[line[2]].marker == TTTGame::COMPUTER_MARKER
+      elsif count_computer_marker(@squares.values_at(*line)) == 3
         return TTTGame::COMPUTER_MARKER
       end
     end
     nil
+  end
+
+  def reset
+    (1..9).each {|key| @squares[key] = Square.new }
   end
 end
 
@@ -97,8 +106,8 @@ class TTTGame
     puts "Thanks for playing Tic Tac Toe! Goodbye!"
   end
 
-  def display_board
-    system 'clear' || system('cls')
+  def display_board(clear = true)
+    system 'clear' || system('cls') if clear
     puts " Player Marker: #{human.marker} || Computer Marker: #{computer.marker}"
     puts ""
     puts "     |     |"
@@ -139,23 +148,42 @@ class TTTGame
     when COMPUTER_MARKER
       puts "Computer won!"
     else
-      puts "The board is full!"
+      puts "It's a tie!"
     end
+  end
+
+  def play_again?
+    answer = nil
+    loop do
+      puts "Would you like to play again?"
+      answer = gets.chomp.downcase
+      break if %w(y n).include? answer
+      puts "sorry, must be y or n"
+    end
+    answer == 'y'
   end
 
   def play
     display_welcome_message
-    display_board
-    # who goes first?
+    system 'clear' || system('cls')
+    # Main Game loop
     loop do
-      human_moves
-      break if board.someone_won? || board.full?
-     
-      computer_moves
-      break if board.someone_won? || board.full?
-      display_board
+      display_board(false)
+      # who goes first?
+      loop do
+        human_moves
+        break if board.someone_won? || board.full?
+      
+        computer_moves
+        break if board.someone_won? || board.full?
+
+        display_board
+      end
+      display_result
+      break unless play_again?
+      board.reset
+      puts "Let's play again!"
     end
-    display_result
     display_goodbye_message
   end
 end
