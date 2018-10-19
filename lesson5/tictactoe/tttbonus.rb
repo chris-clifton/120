@@ -1,6 +1,8 @@
 require 'pry'
 
 class Board
+  attr_accessor :squares
+
   WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] + # rows
                   [[1, 4, 7], [2, 5, 8], [3, 6, 9]] + # cols
                   [[1, 5, 9], [3, 5, 7]]              # diagonals
@@ -222,11 +224,12 @@ class TTTGame
   end
 
   def computer_moves # rename intelligent_computer_move
-    # attacks_to_win
+    square = nil
+    # attack_to_win
     # defends_threat
-    #takes_middle_square
-    takes_random_square
-    #board[square] = computer.marker
+    square = takes_middle_square
+    #takes_random_square
+    board[square] = computer.marker
   end
 
   def takes_random_square
@@ -234,9 +237,11 @@ class TTTGame
   end
 
   def takes_middle_square
-    if board.unmarked_keys.include?(5)
-      board[5] = computer.marker
+    square = nil
+    if @squares[5].marker == Square::INITIAL_MARKER
+      square = 5
     end
+    square
   end
 
   def current_player_moves
