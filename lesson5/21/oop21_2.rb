@@ -26,13 +26,9 @@ class Participant
     values = hand.map { |card| card[1] }
     sum = 0
     values.each do |value|
-      if value == 'Ace'
-        sum += 11
-      elsif value.to_i == 0
-        sum += 10
-      else
-        sum += value.to_i
-      end
+      sum += 11 if value == 'Ace'
+      sum += 10 if value.to_i == 0
+      sum += value.to_i
     end
 
     # adjusts ace to 1 if sum > 21 and accounts for multiple aces with count
@@ -83,13 +79,9 @@ class Dealer < Participant
     values = hand.map { |card| card[1] }
     sum = 0
     values[1..-1].each do |value|
-      if value == 'Ace'
-        sum += 11
-      elsif value.to_i == 0
-        sum += 10
-      else
-        sum += value.to_i
-      end
+      sum += 11 if value == 'Ace'
+      sum += 10 if value.to_i == 0
+      sum += value.to_i
     end
 
     # adjusts ace to 1 if sum > 21 and accounts for multiple aces with count
@@ -178,19 +170,18 @@ class Game
     puts ''
   end
 
+  # rubocop:disable Metrics/AbcSize
   def player_turn
     loop do
       player_choice = player.hit_or_stay?
-
+      clear
       if player_choice == 'hit'
-        clear
         player.hit!(game_deck.cards)
         puts "You drew the #{format_card(player.hand.last)}."
         display_table
       end
 
       if player_choice == 'stay'
-        clear
         player.stay
         break
       elsif player.busted?
@@ -214,11 +205,7 @@ class Game
       puts "Dealer total: #{dealer.cards_total}"
     end
 
-    if dealer.busted?
-      puts 'Dealer busts.'
-    else
-      dealer.stay
-    end
+    dealer.busted? ? (puts 'Dealer busts.') : dealer.stay
   end
 
   def winner?
@@ -234,6 +221,7 @@ class Game
       @winner = "nobody! It's a tie"
     end
   end
+  # rubocop:enable Metrics/AbcSize
 
   def show_result
     puts ' '
@@ -243,7 +231,7 @@ class Game
     puts "Total: #{@player.cards_total}."
     puts ' '
     puts "#{@dealer.name}:"
-    puts "Cards: #{format_result_hand(dealer)}"
+    puts "Cards: #{format_result_hand(@dealer)}"
     puts "Total: #{@dealer.cards_total}."
     puts ' '
     puts "And the winner is... #{@winner}!"
@@ -271,7 +259,6 @@ class Game
   def start
     # the sequence of steps to execute game play
     loop do
-      # instructions?
       deal_cards!
       display_table
       player_turn
