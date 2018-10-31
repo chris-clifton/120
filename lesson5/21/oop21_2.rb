@@ -1,5 +1,3 @@
-require 'pry'
-
 class Participant
   attr_accessor :hand, :cards_total
   attr_reader :name
