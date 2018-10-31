@@ -70,7 +70,6 @@ end
 class Dealer < Participant
   def initialize
     super
-    @name = 'Dealer'
   end
 
   def shows_total
@@ -191,7 +190,7 @@ class Game
 
   def dealer_turn
     puts ' '
-    puts "#{dealer.name}'s turn..."
+    puts "Dealer's turn..."
     puts "Dealer shows hidden card..."
     puts "Dealer cards: #{format_result_hand(dealer)}"
     puts "Dealer total: #{dealer.cards_total}"
@@ -199,7 +198,7 @@ class Game
     loop do
       break if dealer.cards_total >= 17 || player.busted?
       dealer.hit!(game_deck.cards)
-      puts "#{dealer.name} draws the #{format_card(dealer.hand.last)}."
+      puts "Dealer draws the #{format_card(dealer.hand.last)}."
       puts "Dealer total: #{dealer.cards_total}"
     end
 
@@ -210,11 +209,11 @@ class Game
     if dealer.busted?
       @winner = player.name
     elsif player.busted?
-      @winner = dealer.name
+      @winner = 'Dealer'
     elsif player.cards_total > dealer.cards_total
       @winner = player.name
     elsif dealer.cards_total > player.cards_total
-      @winner = dealer.name
+      @winner = 'Dealer'
     else
       @winner = "nobody! It's a tie"
     end
@@ -228,7 +227,7 @@ class Game
     puts "Cards: #{format_result_hand(player)}"
     puts "Total: #{@player.cards_total}."
     puts ' '
-    puts "#{@dealer.name}:"
+    puts "Dealer:"
     puts "Cards: #{format_result_hand(@dealer)}"
     puts "Total: #{@dealer.cards_total}."
     puts ' '
