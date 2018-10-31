@@ -27,20 +27,16 @@ Verbs
 Write out classes and organize verbs
 
 Player
-- hit
-- stay
-- busted?
-- total
 
 Dealer
-- hit
-- stay
-- busted
-- total
 - deal (could also be in deck)
 
 Participant
 - move some common behaviors here
+- hit
+- stay
+- busted?
+- total
 
 Deck
 - deal

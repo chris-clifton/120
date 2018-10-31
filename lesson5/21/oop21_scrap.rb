@@ -1,15 +1,45 @@
-# Initializes suits and values constants and constructor creates a randomized shuffled deck
-# deck is an array with a suit @ index 0 and a value @ index 1
-class Deck
-  attr_reader :cards
-
-  SUITS = %w(hearts clubs diamonds spades)
-  VALUES = %w(2 3 4 5 6 7 8 9 10 jack queen king ace)
+class Participant
+  attr_accessor :hand
 
   def initialize
-    @cards = SUITS.product(VALUES).shuffle
+    @hand = []
+  end
+
+  def hit
+    # add random card from deck to player hand
+  end
+
+  def stay
+    # shouldn't do much
+  end
+
+  def busted?
+    # if card total > 21 then busted
+  end
+
+  def display_cards
+    self.hand
   end
 end
 
-game_deck = Deck.new
-p game_deck.cards
+class Player < Participant
+  attr_accessor :name
+  def initialize
+    super
+    @name = pick_a_name
+  end
+
+  def pick_a_name
+    puts "Hello Player, what is your name?"
+    answer = nil
+    loop do
+      answer = gets.chomp
+      break unless answer.strip.empty?
+      puts "Please choose a valid name."
+    end
+    self.name = answer
+  end
+end
+
+
+chris = Player.new
