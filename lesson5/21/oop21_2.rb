@@ -17,7 +17,7 @@ class Participant
   end
 
   def busted?
-    cards_total > 21 ? true : false
+    cards_total > 21
   end
 
   def cards_total
