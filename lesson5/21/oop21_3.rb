@@ -1,5 +1,3 @@
-require 'pry'
-
 class Participant
   attr_accessor :hand, :cards_total
   attr_reader :name
@@ -40,6 +38,14 @@ class Participant
 
   def card_total_21?
     cards_total == 21
+  end
+
+  def show_new_card
+    puts "#{name} drew the #{format_card(hand.last)}."
+  end
+
+  def format_card(card)
+    "#{card[1]} of #{card[0]}"
   end
 end
 
@@ -181,42 +187,47 @@ class Game
     puts ''
   end
 
-  # rubocop:disable Metrics/AbcSize
   def player_turn
     loop do
+      break if player.busted? || player.card_total_21?
       player_choice = player.choose_hit_or_stay
-      clear
-      if player_choice == 'hit'
-        player.hit!(game_deck.cards)
-        puts "You drew the #{format_card(player.hand.last)}."
-        display_table
-      end
-
       if player_choice == 'stay'
         player.stay
         break
-      elsif player.busted?
-        puts "#{player.name} busts."
-        break
+      else
+        player.hit!(game_deck.cards)
+        player.show_new_card
+        display_table
       end
     end
   end
 
-  def dealer_turn
+  def display_dealer_turn_message
     puts ' '
     puts "Dealer's turn..."
     puts "Dealer shows hidden card..."
     puts "Dealer cards: #{format_result_hand(dealer)}"
     puts "Dealer total: #{dealer.cards_total}"
     puts ' '
+  end
+
+  def dealer_turn
     loop do
       break if dealer.cards_total >= 17 || player.busted?
       dealer.hit!(game_deck.cards)
-      puts "Dealer draws the #{format_card(dealer.hand.last)}."
+      dealer.show_new_card
       puts "Dealer total: #{dealer.cards_total}"
     end
 
     dealer.busted? ? (puts 'Dealer busts.') : dealer.stay
+  end
+
+  def show_busted
+    if player.busted?
+      puts "#{player.name} busted! #{dealer.name} wins!"
+    elsif dealer.busted?
+      puts "#{dealer.name} busted! #{player.name} wins!"
+    end
   end
 
   def dealer_won?
@@ -242,8 +253,6 @@ class Game
       @winner = "nobody, it's a tie!"
     end
   end
-
-  # rubocop:enable Metrics/AbcSize
 
   def show_result
     puts ' '
@@ -290,8 +299,20 @@ class Game
       display_initial_deal_message
       deal_cards!
       display_table
+      
       player_turn
+        if player.busted?
+          show_busted
+          play_again? ? reset : break
+        end
+
+      display_dealer_turn_message
       dealer_turn
+      if dealer.busted?
+        show_busted
+        play_again? ? reset : break
+      end
+
       determine_winner
       show_result
       play_again? ? reset : break
