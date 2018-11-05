@@ -1,5 +1,10 @@
 class Machine
-  # attr_writer :switch
+  
+  attr_accessor :name
+
+  def initialize(name)
+    @name = name
+  end
 
   def start
     flip_switch(:on)
@@ -9,21 +14,25 @@ class Machine
     flip_switch(:off)
   end
 
-  def status
-    "The state of the switch is #{switch}."
+  def info
+    "The #{name} is currently turned #{switch}."
   end
 
-  private
-
-  attr_accessor :switch
+private
+attr_accessor :switch
 
   def flip_switch(desired_state)
     self.switch = desired_state
   end
 end
 
-computer = Machine.new
+
+computer = Machine.new('computer')
 p computer.start
-p computer.status
+p computer.info
 p computer.stop
-p computer.status
+p computer.info
+
+router = Machine.new('router')
+p router.start
+p router.info
