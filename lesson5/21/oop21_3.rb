@@ -32,7 +32,7 @@ class Participant
     # adjusts ace to 1 if sum > 21 and accounts for multiple aces with count
     values.select { |card| card == 'Ace' }.count.times do
       sum -= 10 if sum > 21
-    end  
+    end
     sum
   end
 
@@ -218,8 +218,6 @@ class Game
       dealer.show_new_card
       puts "Dealer total: #{dealer.cards_total}"
     end
-
-    dealer.busted? ? (puts 'Dealer busts.') : dealer.stay
   end
 
   def show_busted
@@ -299,12 +297,12 @@ class Game
       display_initial_deal_message
       deal_cards!
       display_table
-      
+
       player_turn
-        if player.busted?
-          show_busted
-          play_again? ? reset : break
-        end
+      if player.busted?
+        show_busted
+        play_again? ? reset : break
+      end
 
       display_dealer_turn_message
       dealer_turn
